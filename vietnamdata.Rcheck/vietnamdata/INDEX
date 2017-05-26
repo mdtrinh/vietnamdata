@@ -1,0 +1,28 @@
+SynthATT                Synthetic Control ATT
+VNbudget_final          Vietnam Provincial Budget Finals
+VNbudget_plan           Vietnam Provincial Budget Plans
+bestmatch               Best string match using string distance
+fill.blanks             "Fill down the blank"
+find.numeric            Identify numeric values from a character vector
+genperms                Generate flexible permutation matrix for
+                        blocked, clustered or simpler designs
+is.nan.data.frame       Identify 'NaN' in a dataframe.
+neglog                  Negative-log transformation
+papi                    etnam PAPI Data
+pci                     Vietnam PCI Data
+plot.riFit              Plot Point Estimate and Randomization
+                        Distribution for Randomization Inference Result
+plot.riSynth            Plot Point Estimate and Randomization
+                        Distribution for Randomization Inference Result
+                        from riSynth
+riSynth                 Randomization Inference on ATT using Synthetic
+                        Control
+riSynthToriFit          Convert 'riSynth' object to 'riFit'
+rireg                   Randomization Inference on Treatment Effect
+                        using Linear Regression
+riwfe                   Randomization Inference on Treatment Effect
+                        using Weighted Fixed Effects Regression
+vietnamdata             vietnamdata: Data and Empirical Tools for
+                        Quantitative Political Science Research on
+                        Vietnam
+year                    Extract year from date

@@ -24,7 +24,7 @@ An analogue to the log transformation for negative values.
 }
 \details{
 \code{neglog(x)} is calculated such that
-\eqn{neglog(x) = sign(x) \times \log|x + \text{offset}|}{neglox(x) = sign(x) * \log(|x + offset|)}.
+\eqn{neglog(x) = sign(x) \times \log |x + offset|}{neglog(x) = sign(x) * \log(|x + offset|)}.
 The offset ensures that no \code{-Inf} value is returned.
 The default offset is 0.5.
 }
