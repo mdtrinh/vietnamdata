@@ -119,9 +119,9 @@ bestmatch <- function(string, stringVector){
 year <- function(date) {
     unname(sapply(date, function(d) {
         if(grepl("/", d)==TRUE) {
-            date <- as.Date(str_trim(d), "%d/%m/%Y")
-        } else if(nchar(str_trim(d))==4){
-            date <- as.Date(str_trim(d), "%Y")
+            date <- as.Date(stringr::str_trim(d), "%d/%m/%Y")
+        } else if(nchar(stringr::str_trim(d))==4){
+            date <- as.Date(stringr::str_trim(d), "%Y")
         } else {
             date <- as.Date(as.numeric(d), origin="1900-01-01")
         }

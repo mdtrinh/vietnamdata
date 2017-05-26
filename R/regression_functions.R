@@ -45,7 +45,7 @@ genperms <- function(x, block = NULL, clus = NULL, maxiter = 10000) {
 
             perm <- permute::shuffleSet(length(clus.trim),
                                         nset = maxiter,
-                                        how(block = block.trim))
+                                        permute::how(block = block.trim))
         } else {
             perm <- permute::shuffleSet(length(clus.trim),
                                         nset = maxiter)
@@ -59,7 +59,7 @@ genperms <- function(x, block = NULL, clus = NULL, maxiter = 10000) {
         if(!is.null(block)) {
             perm <- permute::shuffleSet(length(x),
                                         nset = maxiter,
-                                        how(block = block))
+                                        permute::how(block = block))
         } else {
             perm <- permute::shuffleSet(length(x),
                                         nset = maxiter)
@@ -290,8 +290,10 @@ riwfe <- function(data, outcome, treatment, covs, blockvar = NULL, clustvar = NU
 #' @param xmin a numeric indicating the minimum value of the plot's main axix
 #' @param xmax a numeric indicating the maximum value of the plot's main axix
 #' @param axe.y logical; if TRUE the y-axis is shown (default is FALSE)
+#' @param ... Other arguments passed on to \code{ggplot2::ggplot}. Currently unused
+#' @import ggplot2
 #' @export
-plot.riFit <- function(x, title = NULL, xlab = NULL, ylab=NULL, scale=F, xmin, xmax, axe.y=F){
+plot.riFit <- function(x, title = NULL, xlab = NULL, ylab=NULL, scale=F, xmin, xmax, axe.y=F, ...){
     beta.null <- data.frame(beta = x$beta)
     beta.actual <- x$beta.actual
 
@@ -316,7 +318,7 @@ plot.riFit <- function(x, title = NULL, xlab = NULL, ylab=NULL, scale=F, xmin, x
                                axis.title.y=element_blank(),legend.position="none")
     }
 
-    ggplot2::ggplot(beta.null, aes(x = beta)) +
+    ggplot2::ggplot(beta.null, aes(x = beta), ...) +
         ggplot2::stat_bin(aes(y=..count../sum(..count..)), fill = "grey") +
         ggplot2::geom_vline(aes(xintercept = beta.actual), colour="red") +
         ggplot2::geom_vline(aes(xintercept = 0), linetype="dashed", colour="black") +
@@ -368,8 +370,6 @@ SynthATT <- function(data, outcome, treatment, covs,
                      treatment.year, pretreatment.year, posttreatment.year=NULL,
                      unit.variable, unit.names.variable, time.variable,
                      include.past.Y = TRUE, snowfall=FALSE) {
-    #require(Synth)
-
     # check whether past outcomes is used as predictors
     if(include.past.Y) {
         predictors <- c(outcome, treatment, covs)
@@ -391,7 +391,7 @@ SynthATT <- function(data, outcome, treatment, covs,
                         "treatment.year", "pretreatment.year", "posttreatment.year",
                         "unit.variable", "unit.names.variable", "time.variable",
                         "include.past.Y", "treatment.identifier", "control.identifier"))
-        snowfall::sfLibrary(Synth)
+        snowfall::sfLibrary("Synth")
 
         apply.fun <- snowfall::sfSapply
     }
@@ -468,7 +468,7 @@ riSynth <- function(data, outcome, treatment, covs,
                     include.past.Y = TRUE, snowfall=FALSE, maxiter = 1000) {
 
     # loop over all treated units
-    tau.actual <- Synth.att(data, outcome, treatment, covs,
+    tau.actual <- SynthATT(data, outcome, treatment, covs,
                             treatment.year, pretreatment.year, posttreatment.year,
                             unit.variable, unit.names.variable, time.variable,
                             include.past.Y, snowfall)
@@ -482,8 +482,8 @@ riSynth <- function(data, outcome, treatment, covs,
         snowfall::sfExport(list=c("data", "outcome", "treatment", "covs",
                         "treatment.year", "pretreatment.year", "posttreatment.year",
                         "unit.variable", "unit.names.variable", "time.variable",
-                        "include.past.Y", "Synth.att", "perm"))
-        snowfall::sfLibrary(Synth)
+                        "include.past.Y", "SynthATT", "perm"))
+        snowfall::sfLibrary("Synth")
 
         apply.fun <- snowfall::sfLapply
     } else {
@@ -493,7 +493,7 @@ riSynth <- function(data, outcome, treatment, covs,
         treatment.perm <- perm[,i]
         data[[treatment]][which(data[[time.variable]] == treatment.year)] <- treatment.perm
 
-        tau <- tryCatch(Synth.att(data, outcome, treatment, covs,
+        tau <- tryCatch(SynthATT(data, outcome, treatment, covs,
                                   treatment.year, pretreatment.year, posttreatment.year,
                                   unit.variable, unit.names.variable, time.variable,
                                   include.past.Y, snowfall = snowfall),
@@ -563,9 +563,9 @@ riSynthToriFit <- function(riSynth.obj) {
 #' @param x an \code{riSynth} object
 #' @param att logical; currently unused
 #' @export
-plot.riSynth <- function(x, title = NULL, xlab = NULL, ylab=NULL, scale=F, xmin, xmax, att=T, axe.y=F) {
+plot.riSynth <- function(x, title = NULL, xlab = NULL, ylab=NULL, scale=F, xmin, xmax, att=T, axe.y=F, ...) {
 
-    x <- riSynthToriFit(riSynth.obj)
+    x <- riSynthToriFit(x)
 
-    plot.riFit(x, title, xlab, ylab, scale, xmin, xmax, axe.y)
+    plot.riFit(x, title, xlab, ylab, scale, xmin, xmax, axe.y, ...)
 }

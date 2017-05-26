@@ -6,7 +6,7 @@
 Inference Result from riSynth}
 \usage{
 \method{plot}{riSynth}(x, title = NULL, xlab = NULL, ylab = NULL,
-  scale = F, xmin, xmax, att = T, axe.y = F)
+  scale = F, xmin, xmax, att = T, axe.y = F, ...)
 }
 \arguments{
 \item{x}{an \code{riSynth} object}
@@ -27,6 +27,8 @@ distribution is demeaned and normalized before plotting (default is FALSE)}
 \item{att}{logical; currently unused}
 
 \item{axe.y}{logical; if TRUE the y-axis is shown (default is FALSE)}
+
+\item{...}{Other arguments passed on to \code{ggplot2::ggplot}. Currently unused}
 }
 \description{
 A plot showing the point estimate for the treatment effect as a red line, and

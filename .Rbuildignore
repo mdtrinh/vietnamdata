@@ -1,3 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^data-raw$
+^vietnamdata\.bib$
+^README\.Rmd$
+^README-.*\.png$

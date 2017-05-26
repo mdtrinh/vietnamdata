@@ -1,0 +1,27 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "README-"
+)
+```
+
+# vietnamdata
+
+The vietnamdata package rovides several datasets that are useful for social researchers interested in Vietnam, and convenient 
+functions for empirical analysis using these datasets. It includes data on Vietnam's provincial macroeconomics, budget cycles, demographics, and aggregate results from the PCI and PAPI surveys. To facilitate empirical analyis at the provincial level, the package provides tools to conduct randomization inference implementations of common statistical methods.
+
+## Installation
+
+You can install vietnamdata from github with:
+
+```{r gh-installation, eval = FALSE}
+# install.packages("devtools")
+devtools::install_github("mdtrinh/vietnamdata")
+```
