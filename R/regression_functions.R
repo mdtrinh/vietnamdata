@@ -91,6 +91,11 @@ genperms <- function(x, block = NULL, clus = NULL, maxiter = 10000) {
 #' @param treatment a character. Name of the treatment variable.
 #' @param covs a character vector. Names of the covariates to be used in the
 #'   model.
+#' @param perm a matrix containing permutations of the treatment variable (for
+#'   \code{rireg} or \code{riSynth}) or the outcome variable (for \code{riwfe}).
+#'   When \code{perm} is supplied the call to \code{genperms} will not be made
+#'   and the arguments \code{blockvar}, \code{clustvar} and \code{maxiter} will
+#'   be ignored
 #' @param blockvar an optional character vector. Name of the block variable if
 #'   the randomization inference procedure requires block randomization. The
 #'   variable named by \code{blockvar} will be used as input for the
@@ -104,7 +109,7 @@ genperms <- function(x, block = NULL, clus = NULL, maxiter = 10000) {
 #'   as input for the \code{genperms} function.
 #' @return An object of class \code{riFit}
 #' @export
-rireg <- function(data, outcome, treatment, covs, blockvar = NULL, clustvar = NULL, maxiter = 10000) {
+rireg <- function(data, outcome, treatment, covs, perm = NULL, blockvar = NULL, clustvar = NULL, maxiter = 10000) {
 
     # run regression once to get point estimate
     full <- lm(as.formula(paste(outcome, paste(c(treatment, covs), collapse = "+"), sep = "~")), data = data)
@@ -128,17 +133,29 @@ rireg <- function(data, outcome, treatment, covs, blockvar = NULL, clustvar = NU
     }
 
     # generate permutation of the treatment variable
-    if(!is.null(blockvar)){
+
+    # if a permutation is supplied, skip generating permutation
+    if(!is.null(perm)){
+      if(ncol(perm) != nrow(data) & nrow(perm) != nrow(data)) {
+        stop("Dimension of perm does not match nrow(data)!")
+      } else if(ncol(perm) == nrow(data)) {
+        perm <- t(perm) ## transpose perm s.t. nrow(perm) = nrow(data)
+      }
+      message("Using user-supplied permutation matrix...")
+    } else {
+      if(!is.null(blockvar)){
         block <- as.integer(as.factor(data[[blockvar]]))
-    } else {
+      } else {
         block <- NULL
-    }
-    if(!is.null(clustvar)){
+      }
+      if(!is.null(clustvar)){
         clus <- as.integer(as.factor(data[[clustvar]]))
-    } else {
+      } else {
         clus <- NULL
+      }
+      perm <- vietnamdata::genperms(treatment.tilde, block = block, clus = clus)
+      message("Using auto-generated permutation matrix...")
     }
-    perm <- vietnamdata::genperms(treatment.tilde, block = block, clus = clus)
 
     # for each permutation of the vector, calculate treatment effect
     beta <- rep(NA, ncol(perm)) # initiialize vector before the loop
@@ -199,7 +216,7 @@ rireg <- function(data, outcome, treatment, covs, blockvar = NULL, clustvar = NU
 #' @inheritParams wfe::wfe
 #' @return An object of class \code{riFit}
 #' @export
-riwfe <- function(data, outcome, treatment, covs, blockvar = NULL, clustvar = NULL, maxiter = 1000,
+riwfe <- function(data, outcome, treatment, covs, perm = NULL, blockvar = NULL, clustvar = NULL, maxiter = 1000,
                   unit.index, time.index, method, qoi = "ate", estimator = NULL, unbiased.se = TRUE) {
 
     # run true regression once to get point estimate
@@ -219,17 +236,30 @@ riwfe <- function(data, outcome, treatment, covs, blockvar = NULL, clustvar = NU
     # the idea is that permuting the outcome vector is the
     # same as permuting all the rows of the (treat, covs)
     # matrix
-    if(!is.null(blockvar)){
+
+    # if a permutation is supplied, skip generating permutation
+    if(!is.null(perm)){
+      if(ncol(perm) != nrow(data) & nrow(perm) != nrow(data)) {
+        stop("Dimension of perm does not match nrow(data)!")
+      } else if(ncol(perm) == nrow(data)) {
+        perm <- t(perm) ## transpose perm s.t. nrow(perm) = nrow(data)
+      }
+      message("Using user-supplied permutation matrix...")
+    } else {
+
+      if(!is.null(blockvar)){
         block <- as.integer(as.factor(data[[blockvar]]))
-    } else {
+      } else {
         block <- NULL
-    }
-    if(!is.null(clustvar)){
+      }
+      if(!is.null(clustvar)){
         clus <- as.integer(as.factor(data[[clustvar]]))
-    } else {
+      } else {
         clus <- NULL
+      }
+      perm <- vietnamdata::genperms(outcome, block = block, clus = clus)
+      message("Using auto-generated permutation matrix...")
     }
-    perm <- vietnamdata::genperms(data[[outcome]], block = block, clus = clus, maxiter = 1000)
 
     beta <- c()
     p <- c()
@@ -459,6 +489,7 @@ SynthATT <- function(data, outcome, treatment, covs,
 #' parallel computation to improve computation speed.
 #'
 #' @inheritParams SynthATT
+#' @inheritParams rireg
 #' @inheritParams genperms
 #' @return An object of class "riSynth"
 #' @export
@@ -474,7 +505,20 @@ riSynth <- function(data, outcome, treatment, covs,
                             include.past.Y, snowfall)
 
     # generate permutations of treatment variable
-    perm <- genperms(data[[treatment]][which(data[[time.variable]] == treatment.year)], maxiter)
+
+    # if a permutation is supplied, skip generating permutation
+    if(!is.null(perm)){
+      if(ncol(perm) != length(data[[treatment]][which(data[[time.variable]] == treatment.year)]) &
+         nrow(perm) != length(data[[treatment]][which(data[[time.variable]] == treatment.year)])) {
+        stop("Dimension of perm does not match number of units!")
+      } else if(ncol(perm) == length(data[[treatment]][which(data[[time.variable]] == treatment.year)])) {
+        perm <- t(perm) ## transpose perm s.t. nrow(perm) = nrow(data)
+      }
+      message("Using user-supplied permutation matrix...")
+    } else {
+      perm <- genperms(data[[treatment]][which(data[[time.variable]] == treatment.year)], maxiter)
+      message("Using auto-generated permutation matrix...")
+    }
 
     if(snowfall){
         requireNamespace(snowfall, quietly = TRUE)
