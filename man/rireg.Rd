@@ -4,8 +4,10 @@
 \alias{rireg}
 \title{Randomization Inference on Treatment Effect using Linear Regression}
 \usage{
-rireg(data, outcome, treatment, covs, blockvar = NULL, clustvar = NULL,
-  maxiter = 10000)
+rireg(data, outcome, treatment, covs, perm = NULL, blockvar = NULL,
+  clustvar = NULL, maxiter = 10000, covs_control = list(method =
+  "Euclidean", tol_quantile = 0.05, tol_function = function(x) 0.25 * sd(x),
+  tol_value = NULL))
 }
 \arguments{
 \item{data}{a data frame containing the variables in the model}
@@ -16,6 +18,12 @@ rireg(data, outcome, treatment, covs, blockvar = NULL, clustvar = NULL,
 
 \item{covs}{a character vector. Names of the covariates to be used in the
 model.}
+
+\item{perm}{a matrix containing permutations of the treatment variable (for
+\code{rireg} or \code{riSynth}) or the outcome variable (for \code{riwfe}).
+When \code{perm} is supplied the call to \code{genperms} will not be made
+and the arguments \code{blockvar}, \code{clustvar} and \code{maxiter} will
+be ignored}
 
 \item{blockvar}{an optional character vector. Name of the block variable if
 the randomization inference procedure requires block randomization. The

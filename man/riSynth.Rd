@@ -39,9 +39,9 @@ to produce the synthetic control}
 \item{snowfall}{a logical; if TRUE the function performs parallel computing
 using the snowfall package}
 
-\item{maxiter}{maximum number of permutations to be included in the
-permutation matrix. If it is possible to perform exact permutation with
-fewer permutations, then the exact permutation matrix is produced.}
+\item{maxiter}{a positive integer. The maximum number of permutations to be
+included in the permutation matrix for the randomization distribution. Used
+as input for the \code{genperms} function.}
 }
 \value{
 An object of class "riSynth"

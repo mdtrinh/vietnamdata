@@ -5,9 +5,11 @@
 \title{Randomization Inference on Treatment Effect using Weighted Fixed Effects
 Regression}
 \usage{
-riwfe(data, outcome, treatment, covs, blockvar = NULL, clustvar = NULL,
-  maxiter = 1000, unit.index, time.index, method, qoi = "ate",
-  estimator = NULL, unbiased.se = TRUE)
+riwfe(data, outcome, treatment, covs, perm = NULL, blockvar = NULL,
+  clustvar = NULL, maxiter = 1000, unit.index, time.index, method,
+  qoi = "ate", estimator = NULL, unbiased.se = TRUE,
+  covs_control = list(method = "Euclidean", tol_quantile = 0.05, tol_function
+  = function(x) 0.25 * sd(x), tol_value = NULL))
 }
 \arguments{
 \item{data}{a data frame containing the variables in the model}
@@ -18,6 +20,12 @@ riwfe(data, outcome, treatment, covs, blockvar = NULL, clustvar = NULL,
 
 \item{covs}{a character vector. Names of the covariates to be used in the
 model.}
+
+\item{perm}{a matrix containing permutations of the treatment variable (for
+\code{rireg} or \code{riSynth}) or the outcome variable (for \code{riwfe}).
+When \code{perm} is supplied the call to \code{genperms} will not be made
+and the arguments \code{blockvar}, \code{clustvar} and \code{maxiter} will
+be ignored}
 
 \item{blockvar}{an optional character vector. Name of the block variable if
 the randomization inference procedure requires block randomization. The
@@ -43,17 +51,24 @@ as input for the \code{genperms} function.}
 
 \item{method}{method for weighted fixed effects regression, either
     \code{unit} for unit fixed effects; \code{time} for time fixed
-    effects. The default is \code{unit}. 
-  }
+    effects. The default is \code{unit}. For two-way weighted fixed
+    effects regression models, set method to the default value
+    \code{unit}.}
 
 \item{qoi}{one of \code{"ate"} or \code{"att"}. The default is
-    \code{"ate"}.
-  }
+    \code{"ate"}. If set to \code{"att"} in implementing \code{"fd"}
+    and \code{"did"} estimators, the comparison of the treated
+    observation is restricted to the control observation from the
+    previous time period but not with the control observation from the
+    next time period.}
 
 \item{estimator}{an optional character string indicating the
-  estimating method. One of \code{"fd"} or \code{"did"}. The default is
-  \code{NULL}.
-  }
+  estimating method. One of \code{"fd"}, \code{"did"}, or
+  \code{"Mdid"}. \code{"fd"} is for First-Difference
+  Design. \code{"did"} is for multi-period Difference-in-Differences
+  design. The default is \code{NULL}. Setting estimator to be
+  \code{"Mdid"} implements the Difference-in-Differences design with
+  Matching on the pretreatment outcome variables.}
 
 \item{unbiased.se}{logical. If \code{TRUE}, bias-asjusted
     heteroskedasticity-robust standard errors are used. See Stock and
